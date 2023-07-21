@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent
 import androidx.compose.foundation.lazy.layout.MutableIntervalList
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 
 internal typealias OnSwipingFunction = (offset: Float, ratio: Float, direction: SwipeDirection) -> Unit
 internal typealias OnSwipedFunction = (item: Any?, direction: SwipeDirection) -> Unit

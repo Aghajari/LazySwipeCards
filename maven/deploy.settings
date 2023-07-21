@@ -1,0 +1,8 @@
+siteUrl = https://github.com/Aghajari/LazySwipeCards
+gitUrl = https://github.com/Aghajari/LazySwipeCards.git
+version = 1.0.0
+groupId = io.github.aghajari
+licenses = ['Apache-2.0']
+id = LazySwipeCards
+name = LazySwipeCards
+description = LazySwipeCards is a card swiping jetpack compose library
