@@ -1,7 +1,7 @@
 # LazySwipeCards
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](http://developer.android.com/index.html)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.aghajari/LazySwipeCards.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.aghajari/LazySwipeCards/1.0.0/aar)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.aghajari/LazySwipeCards.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.aghajari/LazySwipeCards/1.0.1/aar)
 [![Join the chat at https://gitter.im/Aghajari/community](https://badges.gitter.im/Aghajari/community.svg)](https://gitter.im/Aghajari/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **LazySwipeCards** is a card swiping [Jetpack Compose](https://developer.android.com/jetpack/compose) library.
@@ -15,7 +15,14 @@
 
 Gradle
 ```gradle
-implementation 'io.github.aghajari:LazySwipeCards:1.0.0'
+implementation 'io.github.aghajari:LazySwipeCards:1.0.1'
+
+// needs compose-boom 2024.02.01
+implementation platform('androidx.compose:compose-bom:2024.02.01')
+implementation 'androidx.compose.ui:ui'
+implementation 'androidx.compose.ui:ui-graphics'
+implementation 'androidx.compose.ui:ui-tooling-preview'
+implementation 'androidx.compose.material3:material3'
 ```
 
 Maven
@@ -23,7 +30,7 @@ Maven
 <dependency>
   <groupId>io.github.aghajari</groupId>
   <artifactId>LazySwipeCards</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <type>pom</type>
 </dependency>
 ```
