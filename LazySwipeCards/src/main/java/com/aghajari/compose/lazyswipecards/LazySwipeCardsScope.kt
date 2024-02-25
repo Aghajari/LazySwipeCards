@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.aghajari.compose.lazyswipecards
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -28,6 +26,7 @@ interface LazySwipeCardsScope {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazySwipeCardsScopeImpl : LazySwipeCardsScope {
 
     private val _intervals = MutableIntervalList<LazySwipeCardsIntervalContent>()
@@ -69,8 +68,9 @@ internal class LazySwipeCardsScopeImpl : LazySwipeCardsScope {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazySwipeCardsIntervalContent(
     val list: MutableList<*>,
     val item: @Composable (index: Int) -> Unit
-) : LazyLayoutIntervalContent
+) : LazyLayoutIntervalContent.Interval
 

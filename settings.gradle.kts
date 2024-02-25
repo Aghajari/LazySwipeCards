@@ -12,6 +12,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
 rootProject.name = "LazySwipeCards"
-include ':app'
-include ':LazySwipeCards'
+include(":app")
+include(":LazySwipeCards")

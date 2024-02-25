@@ -22,7 +22,8 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -98,8 +99,8 @@ fun LazySwipeCards(
     }
 
     val offsetX = remember { Animatable(0f) }
-    val width = remember { mutableStateOf(1) }
-    val ratio = calculateRatio(offsetX.value, width.value, swipeThreshold)
+    val width = remember { mutableIntStateOf(1) }
+    val ratio = calculateRatio(offsetX.value, width.intValue, swipeThreshold)
 
     val itemProvider = rememberLazySwipeCardsItemProvider(content)
     itemProvider.onSwiping(offsetX.value, ratio)
@@ -120,7 +121,7 @@ fun LazySwipeCards(
                     rotationZ = rotateDegree * ratio
                 )
         } else {
-            var itemHeight by remember { mutableStateOf(0) }
+            var itemHeight by remember { mutableIntStateOf(0) }
             val indexWithRatio = if (cardIndex == visibleItemCount) {
                 visibleItemCount - 1f
             } else {
@@ -144,7 +145,7 @@ fun LazySwipeCards(
     Box(
         modifier = modifier
             .onSizeChanged {
-                width.value = max(1, it.width)
+                width.intValue = max(1, it.width)
             }
             .padding(contentPadding),
         contentAlignment = Alignment.Center
@@ -152,7 +153,7 @@ fun LazySwipeCards(
         val visible = min(visibleItemCount, itemProvider.itemCount - 1)
         for (index in visible downTo 0) {
             Card(Modifier.applyTransformation(index)) {
-                itemProvider.Item(index)
+                itemProvider.Item(index, itemProvider.getKey(index))
             }
         }
     }
@@ -170,7 +171,7 @@ private fun Modifier.swipeListener(
 ) = composed {
     val density = LocalDensity.current.density
     var padding by remember {
-        mutableStateOf(0f)
+        mutableFloatStateOf(0f)
     }
 
     onSizeChanged {

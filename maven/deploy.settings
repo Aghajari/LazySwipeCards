@@ -1,6 +1,6 @@
 siteUrl = https://github.com/Aghajari/LazySwipeCards
 gitUrl = https://github.com/Aghajari/LazySwipeCards.git
-version = 1.0.0
+version = 1.0.1
 groupId = io.github.aghajari
 licenses = ['Apache-2.0']
 id = LazySwipeCards

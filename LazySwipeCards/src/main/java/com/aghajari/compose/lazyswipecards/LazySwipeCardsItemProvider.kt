@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.aghajari.compose.lazyswipecards
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -15,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun rememberLazySwipeCardsItemProvider(
     content: LazySwipeCardsScope.() -> Unit,
@@ -37,12 +36,14 @@ internal fun rememberLazySwipeCardsItemProvider(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 internal interface LazySwipeCardsItemProvider : LazyLayoutItemProvider {
 
     fun onSwiped(targetOffset: Float): Boolean
     fun onSwiping(offset: Float, ratio: Float)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 private class LazySwipeCardsItemProviderImpl(
     val intervals: IntervalList<LazySwipeCardsIntervalContent>,
     val providerCacheKey: MutableState<ProviderCacheKey>,
@@ -57,7 +58,7 @@ private class LazySwipeCardsItemProviderImpl(
     override fun onSwiping(offset: Float, ratio: Float) {
         onSwiping?.invoke(offset, ratio, getDirection(offset))
     }
-
+    
     override fun onSwiped(targetOffset: Float): Boolean {
         repeat(intervals.size) {
             if (intervals[it].value.list.isNotEmpty()) {
@@ -90,11 +91,9 @@ private class DefaultDelegatingLazySwipeCardsItemProvider(
     override val itemCount: Int get() = delegate.value.itemCount
 
     @Composable
-    override fun Item(index: Int) {
-        delegate.value.Item(index)
+    override fun Item(index: Int, key: Any) {
+        delegate.value.Item(index, key)
     }
-
-    override val keyToIndexMap: Map<Any, Int> get() = delegate.value.keyToIndexMap
 
     override fun getKey(index: Int): Any = delegate.value.getKey(index)
 
@@ -107,20 +106,22 @@ private class DefaultDelegatingLazySwipeCardsItemProvider(
 
 private class ProviderCacheKey
 
-private fun <T : LazyLayoutIntervalContent> LazyLayoutItemProvider(
+@OptIn(ExperimentalFoundationApi::class)
+private fun <T : LazyLayoutIntervalContent.Interval> LazyLayoutItemProvider(
     intervals: IntervalList<T>,
     itemContent: @Composable (interval: T, index: Int) -> Unit,
 ): LazyLayoutItemProvider =
     DefaultLazyLayoutItemsProvider(itemContent, intervals)
 
-private class DefaultLazyLayoutItemsProvider<IntervalContent : LazyLayoutIntervalContent>(
+@OptIn(ExperimentalFoundationApi::class)
+private class DefaultLazyLayoutItemsProvider<IntervalContent : LazyLayoutIntervalContent.Interval>(
     val itemContentProvider: @Composable IntervalContent.(index: Int) -> Unit,
     val intervals: IntervalList<IntervalContent>
 ) : LazyLayoutItemProvider {
     override val itemCount get() = intervals.size
 
     @Composable
-    override fun Item(index: Int) {
+    override fun Item(index: Int, key: Any) {
         withLocalIntervalIndex(index) { localIndex, content ->
             content.itemContentProvider(localIndex)
         }
