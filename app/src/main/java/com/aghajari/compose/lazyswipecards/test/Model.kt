@@ -1,6 +1,6 @@
 package com.aghajari.compose.lazyswipecards.test
 
-val models = arrayOf(
+val models = listOf(
     Model(
         text = "Mount Bromo, Indonesia",
         image = "file:///android_asset/img1.jpg"
