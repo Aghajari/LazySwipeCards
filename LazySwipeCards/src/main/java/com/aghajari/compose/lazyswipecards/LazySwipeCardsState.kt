@@ -67,6 +67,30 @@ class LazySwipeCardsState(
         offsetXAnimatable.snapTo(0f)
     }
 
+    suspend fun animateBackSwipe(
+        direction: SwipeDirection,
+        animationSpec: AnimationSpec<Float> = SpringSpec(),
+        initialVelocity: Float = 0f,
+    ) {
+        if (selectedItemIndex == 0) {
+            return
+        }
+        _selectedIndex.value--
+
+        updateBounds()
+        val initialOffsetX = if (direction == SwipeDirection.RIGHT) {
+            offsetXAnimatable.upperBound!!
+        } else {
+            offsetXAnimatable.lowerBound!!
+        }
+        offsetXAnimatable.snapTo(initialOffsetX)
+        offsetXAnimatable.animateTo(
+            targetValue = 0f,
+            animationSpec = animationSpec,
+            initialVelocity = initialVelocity,
+        )
+    }
+
     internal fun updateRatio(swipeThreshold: Float) {
         ratio = calculateRatio(offsetX, viewportWidth, swipeThreshold)
     }
