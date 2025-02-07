@@ -6,27 +6,10 @@ task sourcesJar(type: Jar) {
     archiveClassifier = 'sources'
 }
 
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-afterEvaluate {
-    javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompileProvider.get().classpath.files
-    })
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
-
 signing {
     useInMemoryPgpKeys(
             rootProject.ext["signing.keyId"],
