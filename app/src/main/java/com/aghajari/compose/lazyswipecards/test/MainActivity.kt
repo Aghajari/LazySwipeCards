@@ -40,55 +40,55 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
-    @Composable
-    fun MyLazySwipeCards(modifier: Modifier = Modifier) {
-        val list = remember { listOf(*models) }
+@Composable
+fun MyLazySwipeCards(modifier: Modifier = Modifier) {
+    val list = remember { listOf(*models) }
 
-        LazySwipeCards(
-            modifier = modifier.fillMaxSize(),
-            cardShape = RoundedCornerShape(16.dp),
-            cardShadowElevation = 4.dp,
-            visibleItemCount = 3,
-            isEndless = false,
-        ) {
-            onSwiped { model, dir ->
-                println("OnSwiped: ${(model as Model).text} to ${dir.name}")
-            }
-            onSwiping { x, ratio, dir ->
-                println("$x : $ratio : ${dir.name}")
-            }
+    LazySwipeCards(
+        modifier = modifier.fillMaxSize(),
+        cardShape = RoundedCornerShape(16.dp),
+        cardShadowElevation = 4.dp,
+        visibleItemCount = 3,
+        isEndless = false,
+    ) {
+        onSwiped { model, dir ->
+            println("OnSwiped: ${(model as Model).text} to ${dir.name}")
+        }
+        onSwiping { x, ratio, dir ->
+            println("$x : $ratio : ${dir.name}")
+        }
 
-            items(list) {
-                Box {
-                    AsyncImage(
-                        model = it.image,
-                        contentDescription = it.text,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Text(
-                        text = it.text,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .padding(
-                                horizontal = 16.dp,
-                                vertical = 28.dp
-                            )
-                            .align(Alignment.BottomCenter)
-                    )
-                }
+        items(list) {
+            Box {
+                AsyncImage(
+                    model = it.image,
+                    contentDescription = it.text,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                Text(
+                    text = it.text,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 28.dp,
+                        )
+                        .align(Alignment.BottomCenter),
+                )
             }
         }
     }
+}
 
-    @Preview(showBackground = true)
-    @Composable
-    fun ActivityPreview() {
-        ApplicationTheme {
-            MyLazySwipeCards()
-        }
+@Preview(showBackground = true)
+@Composable
+fun PreviewLazySwipeCards() {
+    ApplicationTheme {
+        MyLazySwipeCards()
     }
 }
