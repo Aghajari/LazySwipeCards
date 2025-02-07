@@ -28,8 +28,7 @@ internal fun Modifier.swipe(
 ): Modifier {
     return this then if (cardIndex == 0) {
         swipeListener(
-            offsetX = state.offsetXAnimatable,
-            width = state.viewportWidth,
+            state = state,
             rotateDegree = rotateDegree,
             translateSize = translateSize,
             swipeThreshold = swipeThreshold,

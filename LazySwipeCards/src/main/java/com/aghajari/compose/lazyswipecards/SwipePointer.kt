@@ -9,7 +9,6 @@ import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.horizontalDrag
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -27,11 +26,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
-import kotlin.math.max
 
 internal fun Modifier.swipeListener(
-    offsetX: Animatable<Float, AnimationVector1D>,
-    width: Int,
+    state: LazySwipeCardsState,
     rotateDegree: Float,
     translateSize: Dp,
     swipeThreshold: Float,
@@ -48,31 +45,28 @@ internal fun Modifier.swipeListener(
         val points = FloatArray(2) { 0f }
         transform.mapPoints(points)
         padding = points[0].absoluteValue + translateSize.value * density
+        state.bound = it.width + padding
     }.pointerInput(Unit) {
         val decay = splineBasedDecay<Float>(this)
         coroutineScope {
             while (true) {
                 val velocity = awaitSwipe(
                     coroutineScope = this,
-                    offsetX = offsetX,
+                    offsetX = state.offsetXAnimatable,
                 )
-                val bound = max(
-                    width.toFloat(),
-                    size.width.toFloat() + padding
-                )
-                offsetX.updateBounds(
-                    lowerBound = -bound,
-                    upperBound = bound
-                )
-                val ratio = calculateRatio(offsetX.value, width, swipeThreshold)
-                    .absoluteValue
+                val ratio = calculateRatio(
+                    offsetX = state.offsetX,
+                    width = state.viewportWidth,
+                    swipeThreshold = swipeThreshold,
+                ).absoluteValue
+                state.bound = size.width.toFloat() + padding
 
                 afterSwipe(
                     coroutineScope = this,
-                    offsetX = offsetX,
+                    offsetX = state.offsetXAnimatable,
+                    bound = state.bound,
                     velocity = velocity,
                     ratio = ratio,
-                    bound = bound,
                     minRatioBound = minRatioBound,
                     animationSpec = animationSpec,
                     decay = decay,
@@ -120,7 +114,7 @@ private fun afterSwipe(
 ) {
     val targetOffsetX = decay.calculateTargetValue(
         initialValue = offsetX.value,
-        initialVelocity = velocity
+        initialVelocity = velocity,
     )
 
     coroutineScope.launch {
@@ -133,13 +127,13 @@ private fun afterSwipe(
                         offsetX.lowerBound!!
                     },
                     animationSpec = animationSpec,
-                    initialVelocity = velocity
+                    initialVelocity = velocity,
                 )
             } else {
                 offsetX.animateTo(
                     targetValue = 0f,
                     animationSpec = animationSpec,
-                    initialVelocity = velocity
+                    initialVelocity = velocity,
                 )
             }
         } else {

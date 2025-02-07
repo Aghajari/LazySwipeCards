@@ -73,7 +73,7 @@ private class LazySwipeCardsItemProviderImpl(
         withLocalIntervalIndex(realFrontIndex, intervals) { localIndex, content ->
             val item = content.list[localIndex]
             onSwiped?.invoke(item, getSwipeDirection(targetOffset))
-            state.onSwiped()
+            state.selectNextItem()
         }
         return true
     }

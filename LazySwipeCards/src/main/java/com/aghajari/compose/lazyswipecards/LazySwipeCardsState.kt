@@ -1,7 +1,10 @@
 package com.aghajari.compose.lazyswipecards
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -15,6 +18,8 @@ class LazySwipeCardsState(
     initialSelectedItemIndex: Int = 0,
 ) {
 
+    internal var itemProvider: LazySwipeCardsItemProvider? = null
+
     private val _selectedIndex = mutableIntStateOf(initialSelectedItemIndex)
     val selectedItemIndex: Int get() = _selectedIndex.value
 
@@ -25,22 +30,60 @@ class LazySwipeCardsState(
     private val _width = mutableIntStateOf(1)
     val viewportWidth: Int get() = _width.intValue
 
+    internal var bound: Float = 0f
+        get() = max(viewportWidth.toFloat(), field)
+        set(value) {
+            field = value
+            updateBounds()
+        }
+
     var ratio: Float = 0f
         private set
 
     val swipingDirection: SwipeDirection
         get() = getSwipeDirection(offsetX)
 
+    fun snapTo(index: Int) {
+        _selectedIndex.value = index
+    }
+
+    suspend fun animateSwipe(
+        direction: SwipeDirection,
+        animationSpec: AnimationSpec<Float> = SpringSpec(),
+        initialVelocity: Float = 0f,
+    ) {
+        updateBounds()
+        val targetOffsetX = if (direction == SwipeDirection.RIGHT) {
+            offsetXAnimatable.upperBound!!
+        } else {
+            offsetXAnimatable.lowerBound!!
+        }
+        offsetXAnimatable.animateTo(
+            targetValue = targetOffsetX,
+            animationSpec = animationSpec,
+            initialVelocity = initialVelocity,
+        )
+        itemProvider?.onSwiped(targetOffsetX)
+        offsetXAnimatable.snapTo(0f)
+    }
+
     internal fun updateRatio(swipeThreshold: Float) {
         ratio = calculateRatio(offsetX, viewportWidth, swipeThreshold)
     }
 
-    internal fun onSwiped() {
+    internal fun selectNextItem() {
         _selectedIndex.value++
     }
 
     internal fun onSizeChanged(newSize: IntSize) {
         _width.value = max(1, newSize.width)
+    }
+
+    private fun updateBounds() {
+        offsetXAnimatable.updateBounds(
+            lowerBound = -bound,
+            upperBound = bound,
+        )
     }
 
     companion object {
@@ -59,6 +102,13 @@ internal fun LazySwipeCardsState.bind(
     itemProvider: LazySwipeCardsItemProvider,
     cardComposable: @Composable (cardIndex: Int, content: @Composable () -> Unit) -> Unit,
 ) {
+    DisposableEffect(itemProvider) {
+        this@bind.itemProvider = itemProvider
+        onDispose {
+            this@bind.itemProvider = null
+        }
+    }
+
     val selectedIndex = selectedItemIndex
     val visible = if (isEndless) {
         visibleItemCount
