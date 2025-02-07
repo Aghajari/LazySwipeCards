@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.getDefaultLazyLayoutKey
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -16,12 +15,12 @@ import androidx.compose.runtime.rememberUpdatedState
 @Composable
 internal fun rememberLazySwipeCardsItemProvider(
     content: LazySwipeCardsScope.() -> Unit,
-    frontIndex: MutableState<Int>,
     isEndless: Boolean,
+    state: LazySwipeCardsState,
 ): LazySwipeCardsItemProvider {
     val latestContent = rememberUpdatedState(content)
 
-    return remember(isEndless) {
+    return remember(isEndless, state) {
         val listScope = LazySwipeCardsScopeImpl()
             .apply(latestContent.value)
         val itemProviderState = derivedStateOf {
@@ -29,8 +28,8 @@ internal fun rememberLazySwipeCardsItemProvider(
                 intervals = listScope.intervals,
                 onSwiped = listScope.onSwiped,
                 onSwiping = listScope.onSwiping,
-                frontIndex = frontIndex,
                 isEndless = isEndless,
+                state = state,
             )
         }
         delegatingLazySwipeCardsItemProvider(itemProviderState)
@@ -49,41 +48,34 @@ private class LazySwipeCardsItemProviderImpl(
     val intervals: IntervalList<LazySwipeCardsIntervalContent>,
     val onSwiped: OnSwipedFunction?,
     val onSwiping: OnSwipingFunction?,
-    val frontIndex: MutableState<Int>,
     val isEndless: Boolean,
+    val state: LazySwipeCardsState,
 ) : LazySwipeCardsItemProvider,
     LazyLayoutItemProvider by LazyLayoutItemProvider(
         intervals = intervals,
-        itemContent = { interval, index -> interval.item.invoke(index) }
+        itemContent = { interval, index -> interval.item.invoke(index) },
     ) {
 
     override fun onSwiping(offset: Float, ratio: Float) {
-        onSwiping?.invoke(offset, ratio, getDirection(offset))
+        onSwiping?.invoke(offset, ratio, getSwipeDirection(offset))
     }
 
     override fun onSwiped(targetOffset: Float): Boolean {
+        val selectedIndex = state.selectedItemIndex
         val realFrontIndex = if (isEndless) {
-            frontIndex.value % itemCount
+            selectedIndex % itemCount
         } else {
-            if (frontIndex.value >= itemCount) {
+            if (selectedIndex >= itemCount) {
                 return false
             }
-            frontIndex.value
+            selectedIndex
         }
         withLocalIntervalIndex(realFrontIndex, intervals) { localIndex, content ->
             val item = content.list[localIndex]
-            onSwiped?.invoke(item, getDirection(targetOffset))
-            frontIndex.value++
+            onSwiped?.invoke(item, getSwipeDirection(targetOffset))
+            state.onSwiped()
         }
         return true
-    }
-
-    private fun getDirection(offset: Float): SwipeDirection {
-        return if (offset < 0) {
-            SwipeDirection.LEFT
-        } else {
-            SwipeDirection.RIGHT
-        }
     }
 }
 
