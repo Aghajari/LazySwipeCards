@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,17 +43,17 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MyLazySwipeCards(modifier: Modifier = Modifier) {
-        val list = remember { mutableStateListOf(*models) }
+        val list = remember { listOf(*models) }
 
         LazySwipeCards(
             modifier = modifier.fillMaxSize(),
             cardShape = RoundedCornerShape(16.dp),
             cardShadowElevation = 4.dp,
-            visibleItemCount = 3
+            visibleItemCount = 3,
+            isEndless = false,
         ) {
             onSwiped { model, dir ->
                 println("OnSwiped: ${(model as Model).text} to ${dir.name}")
-                // list.add(model as Model)
             }
             onSwiping { x, ratio, dir ->
                 println("$x : $ratio : ${dir.name}")
@@ -66,9 +65,8 @@ class MainActivity : ComponentActivity() {
                         model = it.image,
                         contentDescription = it.text,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     )
-
                     Text(
                         text = it.text,
                         color = Color.White,

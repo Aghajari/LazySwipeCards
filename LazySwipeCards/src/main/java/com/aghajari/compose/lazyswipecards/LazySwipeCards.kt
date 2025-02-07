@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -72,7 +73,9 @@ fun LazySwipeCards(
     swipeThreshold: Float = 0.5f,
     minRatioBound: Float = MAX_RATIO,
     animationSpec: AnimationSpec<Float> = SpringSpec(),
-    content: LazySwipeCardsScope.() -> Unit
+    isEndless: Boolean = false,
+    frontItemIndex: MutableState<Int> = remember { mutableIntStateOf(0) },
+    content: LazySwipeCardsScope.() -> Unit,
 ) {
     require(swipeThreshold > 0f && swipeThreshold <= 1f) {
         "swipeThreshold must be > 0 and <= 1"
@@ -102,7 +105,11 @@ fun LazySwipeCards(
     val width = remember { mutableIntStateOf(1) }
     val ratio = calculateRatio(offsetX.value, width.intValue, swipeThreshold)
 
-    val itemProvider = rememberLazySwipeCardsItemProvider(content)
+    val itemProvider = rememberLazySwipeCardsItemProvider(
+        content = content,
+        frontIndex = frontItemIndex,
+        isEndless = isEndless,
+    )
     itemProvider.onSwiping(offsetX.value, ratio)
 
     fun Modifier.applyTransformation(cardIndex: Int) = composed {
@@ -150,10 +157,19 @@ fun LazySwipeCards(
             .padding(contentPadding),
         contentAlignment = Alignment.Center
     ) {
-        val visible = min(visibleItemCount, itemProvider.itemCount - 1)
+        val visible = if (isEndless) {
+            visibleItemCount
+        } else {
+            min(visibleItemCount, itemProvider.itemCount - 1 - frontItemIndex.value)
+        }
         for (index in visible downTo 0) {
             Card(Modifier.applyTransformation(index)) {
-                itemProvider.Item(index, itemProvider.getKey(index))
+                val itemIndex = if (isEndless) {
+                    (frontItemIndex.value + index) % itemProvider.itemCount
+                } else {
+                    frontItemIndex.value + index
+                }
+                itemProvider.Item(itemIndex, itemProvider.getKey(itemIndex))
             }
         }
     }
@@ -280,11 +296,11 @@ private const val MAX_RATIO = 1f
 @Preview(showBackground = true)
 @Composable
 private fun PreviewLazySwipeCards() {
-    val colors = mutableListOf(
+    val colors = listOf(
         Color.Red,
         Color.Green,
         Color.Blue,
-        Color.Cyan
+        Color.Cyan,
     )
 
     LazySwipeCards(Modifier.fillMaxSize()) {
@@ -292,7 +308,7 @@ private fun PreviewLazySwipeCards() {
             Spacer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = it)
+                    .background(color = it),
             )
         }
     }

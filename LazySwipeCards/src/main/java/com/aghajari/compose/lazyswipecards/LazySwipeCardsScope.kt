@@ -16,12 +16,12 @@ interface LazySwipeCardsScope {
     fun onSwiped(function: OnSwipedFunction)
 
     fun <T> itemsIndexed(
-        items: MutableList<T>,
+        items: List<T>,
         itemContent: @Composable (index: Int, item: T) -> Unit
     )
 
     fun <T> items(
-        items: MutableList<T>,
+        items: List<T>,
         itemContent: @Composable (item: T) -> Unit
     )
 }
@@ -36,7 +36,7 @@ internal class LazySwipeCardsScopeImpl : LazySwipeCardsScope {
     var onSwiping: OnSwipingFunction? = null
 
     override fun <T> items(
-        items: MutableList<T>,
+        items: List<T>,
         itemContent: @Composable (item: T) -> Unit
     ) {
         _intervals.addInterval(
@@ -48,7 +48,7 @@ internal class LazySwipeCardsScopeImpl : LazySwipeCardsScope {
     }
 
     override fun <T> itemsIndexed(
-        items: MutableList<T>,
+        items: List<T>,
         itemContent: @Composable (index: Int, item: T) -> Unit
     ) {
         _intervals.addInterval(
@@ -70,7 +70,7 @@ internal class LazySwipeCardsScopeImpl : LazySwipeCardsScope {
 
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazySwipeCardsIntervalContent(
-    val list: MutableList<*>,
+    val list: List<*>,
     val item: @Composable (index: Int) -> Unit
 ) : LazyLayoutIntervalContent.Interval
 
