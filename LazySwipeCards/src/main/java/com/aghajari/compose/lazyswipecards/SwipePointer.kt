@@ -44,7 +44,7 @@ internal fun Modifier.swipeListener(
         transform.setRotate(rotateDegree, it.width / 2f, it.height / 2f)
         val points = FloatArray(2) { 0f }
         transform.mapPoints(points)
-        padding = points[0].absoluteValue + translateSize.value * density
+        padding = points[0].absoluteValue + translateSize.value.absoluteValue * density
         state.bound = it.width + padding
     }.pointerInput(Unit) {
         val decay = splineBasedDecay<Float>(this)

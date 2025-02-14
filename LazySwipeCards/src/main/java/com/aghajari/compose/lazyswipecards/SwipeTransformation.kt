@@ -26,7 +26,7 @@ internal fun Modifier.swipe(
     animationSpec: AnimationSpec<Float>,
     onSwipe: (Float) -> Unit,
 ): Modifier {
-    return this then if (cardIndex == 0) {
+    return if (cardIndex == 0) {
         swipeListener(
             state = state,
             rotateDegree = rotateDegree,
