@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
@@ -44,9 +45,9 @@ fun LazySwipeCards(
     translateSize: Dp = 24.dp,
     rotateDegree: Float = 14f,
     visibleItemCount: Int = 3,
-    contentPadding: PaddingValues = PaddingValues(
-        vertical = translateSize * visibleItemCount,
-        horizontal = translateSize,
+    contentPadding: PaddingValues = defaultContentPadding(
+        translateSize = translateSize,
+        visibleItemCount = visibleItemCount,
     ),
     swipeThreshold: Float = 0.5f,
     minRatioBound: Float = MAX_RATIO,
@@ -109,6 +110,17 @@ fun LazySwipeCards(
     }
 }
 
+private fun defaultContentPadding(
+    translateSize: Dp,
+    visibleItemCount: Int,
+): PaddingValues {
+    val absTranslateSize = translateSize.value.absoluteValue.dp
+    return PaddingValues(
+        vertical = absTranslateSize * visibleItemCount,
+        horizontal = absTranslateSize,
+    )
+}
+
 internal fun calculateRatio(
     offsetX: Float,
     width: Int,
@@ -134,7 +146,9 @@ private fun PreviewLazySwipeCards() {
         Color.Cyan,
     )
 
-    LazySwipeCards(Modifier.fillMaxSize()) {
+    LazySwipeCards(
+        modifier = Modifier.fillMaxSize(),
+    ) {
         items(colors) {
             Spacer(
                 modifier = Modifier

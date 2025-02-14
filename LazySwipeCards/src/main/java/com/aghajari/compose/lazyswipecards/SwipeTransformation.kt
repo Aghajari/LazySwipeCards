@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 internal fun Modifier.swipe(
     cardIndex: Int,
@@ -67,11 +68,13 @@ private fun Modifier.applyTransformation(
     val scaleX = 1f - indexWithRatio * scaleFactor.scaleX
     val defY = indexWithRatio * translateSize.value *
             LocalDensity.current.density
+    val scaleDiffInY = sign(translateSize.value) *
+            (itemHeight * (1f - scaleY)) / 2f
 
     onSizeChanged { itemHeight = it.height }
         .graphicsLayer(
             scaleX = scaleX,
             scaleY = scaleY,
-            translationY = defY + (itemHeight * (1f - scaleY)) / 2f,
+            translationY = defY + scaleDiffInY,
         )
 }
